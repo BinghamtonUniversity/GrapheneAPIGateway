@@ -10,7 +10,7 @@ class Scheduler extends Model
 {
   protected $table = 'scheduler';
 
-  protected $fillable = ['cron','api_instance_id','route','name','args','enabled'];
+  protected $fillable = ['cron','api_instance_id','route','name','args','enabled','verb'];
   protected $casts = ['args' => 'object','last_response'=>'object','enabled'=>'boolean'];
   protected $appends = ['next_runtimes'];
 

@@ -60,17 +60,17 @@ $router->group(['middleware' => 'public.api.auth','prefix' => 'api'], function (
     
     $router->get('/resources',['uses'=>'ResourcesController@browse','middleware' => 'can:viewAny,App\Models\Resource']);
     $router->get('/resources/type/{type}',['uses'=>'ResourcesController@browse_by_type','middleware' => 'can:viewAny,App\Models\Resource']);
-    $router->get('/resources/{resource_id}',['uses'=>'ResourcesController@read','middleware' => 'can:view,resource_id']);
-    $router->put('/resources/{resource_id}',['uses'=>'ResourcesController@edit','middleware' => 'can:manage,resource_id']);
-    $router->post('/resources',['uses'=>'ResourcesController@add','middleware' => 'can:create,resource_id']);
-    $router->delete('/resources/{resource_id}',['uses'=>'ResourcesController@delete','middleware' => 'can:delete,resource_id']);
+    $router->get('/resources/{resource_id}',['uses'=>'ResourcesController@read','middleware' => 'can:viewAny,App\Models\Resource']);
+    $router->put('/resources/{resource_id}',['uses'=>'ResourcesController@edit','middleware' => 'can:manage,App\Models\Resource']);
+    $router->post('/resources',['uses'=>'ResourcesController@add','middleware' => 'can:manage,App\Models\Resource']);
+    $router->delete('/resources/{resource_id}',['uses'=>'ResourcesController@delete','middleware' => 'can:manage,App\Models\Resource']);
 
     $router->get('/scheduler',['uses'=>'SchedulerController@browse','middleware' => 'can:viewAny,App\Models\Scheduler']);
-    $router->get('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@read','middleware' => 'can:view,scheduler_id']);
-    $router->get('/scheduler/{scheduler_id}/run',['uses'=>'SchedulerController@run','middleware' => 'can:manage,scheduler_id']);
-    $router->put('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@edit','middleware' => 'can:manage,scheduler_id']);
+    $router->get('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@read','middleware' => 'can:view,App\Models\Scheduler']);
+    $router->get('/scheduler/{scheduler_id}/run',['uses'=>'SchedulerController@run','middleware' => 'can:manage,App\Models\Scheduler']);
+    $router->put('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@edit','middleware' => 'can:manage,App\Models\Scheduler']);
     $router->post('/scheduler',['uses'=>'SchedulerController@add','middleware' => 'can:view,App\Models\Scheduler']);
-    $router->delete('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@delete','middleware' => 'can:delete,scheduler_id']);
+    $router->delete('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@delete','middleware' => 'can:delete,App\Models\Scheduler']);
 
     $router->get('/users',['uses'=>'UsersController@browse','middleware' => 'can:viewAny,App\Models\User']);
     $router->get('/users/{user_id}',['uses'=>'UsersController@read','middleware' => 'can:view,user_id']);

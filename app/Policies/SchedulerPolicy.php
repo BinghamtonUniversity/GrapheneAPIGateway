@@ -17,7 +17,7 @@ class SchedulerPolicy
         return $user->admin || $user->developer;
     }
 
-    public function manage(User $user, Scheduler $scheduler)
+    public function manage(User $user)
     {
         return $user->admin || $user->developer;
     }
