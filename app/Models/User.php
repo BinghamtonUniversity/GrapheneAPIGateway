@@ -13,7 +13,7 @@ class User extends Model implements AuthenticatableContract
 
     protected $table = 'users';
 
-    protected $fillable = ['unique_id','admin','developer','active'];
+    protected $fillable = ['unique_id','name','admin','developer','active'];
 
     protected $casts = ['admin' => 'boolean','active' => 'boolean','developer' => 'boolean'];
 
