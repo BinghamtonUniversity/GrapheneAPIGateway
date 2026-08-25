@@ -17,6 +17,7 @@ class User extends Model implements AuthenticatableContract
 
     protected $casts = ['admin' => 'boolean','active' => 'boolean','developer' => 'boolean'];
 
+    public $timestamps = false;
 
     public function apis() {
         return $this->hasMany(API::class);
