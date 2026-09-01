@@ -91,7 +91,6 @@ class APIsController extends Controller
         $api = new API($request->all());
         $api->created_by = Auth::id();
         $api->updated_by = Auth::id();
-        $api->user_id = Auth::id();
         $api->api_type = 'php';
         $api->save();
 
@@ -104,6 +103,7 @@ class APIsController extends Controller
         $api_version->resources = [];
         $api_version->routes = [];
         $api_version->save();
+        $api->user_id = (int)$api->user_id;
         return $api;
     }
 
@@ -120,7 +120,6 @@ class APIsController extends Controller
             $api_version->summary = $request->summary;
             $api_version->description = $request->description;
             $api_version->stable = true;
-            $api_version->user_id = Auth::id();
             $api_version->save();
             return $api_version;
         }else{
@@ -143,6 +142,7 @@ class APIsController extends Controller
         if(is_null($api_version) || $api_version->stable){
             $api_version = new APIVersion();
             $api_version->api_id = $api_id;
+
         }else if(!($first->gte($second) || isset($post_data['force']))){
             abort(409, $api_version);
         }
@@ -153,7 +153,7 @@ class APIsController extends Controller
         if ($request->has('routes')) {
             $api_version->routes = $request->routes;
         }
-        $api_version->user_id = Auth::id();
+
         $api_version->updated_by = Auth::id();
         $api_version->save();
         return $api_version;
