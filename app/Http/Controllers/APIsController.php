@@ -103,6 +103,10 @@ class APIsController extends Controller
         $api_version->resources = [];
         $api_version->routes = [];
         $api_version->save();
+
+        $api_developer = new APIDeveloper(['user_id'=>Auth::id(),'api_id'=>$api->id]);
+        $api_developer->save();
+
         $api->user_id = (int)$api->user_id;
         return $api;
     }
