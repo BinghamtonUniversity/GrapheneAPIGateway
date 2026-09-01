@@ -80,6 +80,7 @@ class APIsController extends Controller
         if (!is_null($api)) {
             $api->updated_by = Auth::id();
             $api->update($request->all());
+            $api->user_id = (int)$api->user_id;
             return $api;
         } else {
             return response('api not found', 404);
