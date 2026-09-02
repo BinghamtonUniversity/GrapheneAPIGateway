@@ -35,7 +35,10 @@ class SchedulerController extends Controller
                                   'last_exec_stop',
                                   'created_at',
                                   'updated_at',
-                                  'api_instance_id')->with(['api_instance'=>function($query){
+                                  'api_instance_id')->whereHas('api_instance.api', function ($query) {
+                        $query->where('api_type', 'php');
+                    })
+            ->with(['api_instance'=>function($query){
             $query->with('environment',function($query){
                 $query->where('server_name', config('app.server_name'));
             });

@@ -18,7 +18,7 @@ class CreateAPIDevelopersTable extends Migration
 
             $table->integer('api_id')->unsigned()->index();
             $table->integer('user_id')->unsigned()->index();
-            $table->foreign('api_id')->references('id')->on('apis');
+            $table->foreign('api_id')->references('id')->on('apis')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users');
         });
     }
