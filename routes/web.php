@@ -26,7 +26,7 @@ $router->group(['middleware' => 'public.api.auth','prefix' => 'api'], function (
     $router->delete('/api_users/{apiuser_id}',['uses'=>'APIUsersController@delete', 'middleware' => 'can:delete,App\Models\APIUser']);
 
     $router->get('/environments',['uses'=>'EnvironmentsController@browse','middleware' => 'can:viewAny,App\Models\Environment']);
-    $router->get('/environments/{environment_id}',['uses'=>'EnvironmentsController@read','middleware' => 'can:view,environment_id']);
+    $router->get('/environments/{environment_id}',['uses'=>'EnvironmentsController@read','middleware' => 'can:viewAny,App\Models\Environment']);
     $router->put('/environments/{environment_id}',['uses'=>'EnvironmentsController@edit','middleware' => 'can:manage,environment_id']);
     $router->post('/environments',['uses'=>'EnvironmentsController@add','middleware' => 'can:create,App\Models\Environment']);
     $router->delete('/environments/{environment_id}',['uses'=>'EnvironmentsController@delete','middleware' => 'can:manage,environment_id']);
@@ -66,7 +66,7 @@ $router->group(['middleware' => 'public.api.auth','prefix' => 'api'], function (
     $router->delete('/resources/{resource_id}',['uses'=>'ResourcesController@delete','middleware' => 'can:manage,App\Models\Resource']);
 
     $router->get('/scheduler',['uses'=>'SchedulerController@browse','middleware' => 'can:viewAny,App\Models\Scheduler']);
-    $router->get('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@read','middleware' => 'can:view,App\Models\Scheduler']);
+    $router->get('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@read','middleware' => 'can:viewAny,App\Models\Scheduler']);
     $router->get('/scheduler/{scheduler_id}/run',['uses'=>'SchedulerController@run','middleware' => 'can:manage,App\Models\Scheduler']);
     $router->get('/scheduler/{scheduler_id}/last_response',['uses'=>'SchedulerController@read_last_response','middleware' => 'can:viewAny,App\Models\Scheduler']);
     $router->put('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@edit','middleware' => 'can:manage,App\Models\Scheduler']);

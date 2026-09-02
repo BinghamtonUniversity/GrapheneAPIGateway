@@ -12,10 +12,6 @@ class SchedulerPolicy
     {
         return $user->admin || $user->developer || $user->is_api_developer();
     }
-    public function view(User $user)
-    {
-        return $user->admin || $user->developer;
-    }
 
     public function manage(User $user)
     {

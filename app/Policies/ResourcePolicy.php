@@ -12,11 +12,6 @@ class ResourcePolicy
         return $user->admin || $user->developer || $user->is_api_developer();
     }
 
-    public function view(User $user)
-    {
-        return $user->admin;
-    }
-
     public function manage(User $user)
     {
         return $user->admin;
