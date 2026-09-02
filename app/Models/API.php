@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ActivityLog;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class API extends Model
 {
+    use SoftDeletes;
   protected $table = 'apis';
 
   protected $fillable = ['api_type','name', 'description', 'tags' ,'user_id'];
