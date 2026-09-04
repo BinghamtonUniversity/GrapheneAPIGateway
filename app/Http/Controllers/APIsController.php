@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use \App\Models\API;
 use App\Models\APIDeveloper;
+use App\Models\APIInstance;
 use \App\Models\APIVersion;
 use Illuminate\Http\Request;
 use \Carbon\Carbon;
@@ -114,6 +115,9 @@ class APIsController extends Controller
 
     public function delete($api_id)
     {
+        if (APIInstance::where('api_id',$api_id)->exists()) {
+            abort(400, "This API is in use by an API Instance, please delete the instance first!");
+        }
         if ( API::where('id',$api_id)->delete() ) {
             return [true];
         }
