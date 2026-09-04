@@ -19,6 +19,7 @@ class CreateAPIVersionsTable extends Migration
             $table->string('summary')->default('');
             $table->string('description')->default('');
             $table->boolean('stable')->default(false);
+            $table->json('version_models')->nullable();
             $table->json('files')->nullable();
             $table->json('functions')->nullable();
             $table->json('resources')->nullable();

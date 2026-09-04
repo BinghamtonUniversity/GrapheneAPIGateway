@@ -146,7 +146,7 @@ class ExecAPI {
                     $file_content = $code_file->content = preg_replace(
                         '/(namespace .*;)/',
                         "$1\n".$use_directive,
-                        $code_file->content,
+                        $code_file->content ?? '',
                         1,
                         $found
                     );
