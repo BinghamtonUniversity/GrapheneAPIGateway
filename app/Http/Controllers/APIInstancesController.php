@@ -20,7 +20,7 @@ class APIInstancesController extends Controller
                 ->with(['api' => function ($query) {
                     $query->where('api_type', 'php');
                 }
-                ])->orderby('name')->get();
+                ])->with('environment')->orderby('name')->get();
         }else{
             return APIInstance::whereHas('environment',function($query) {
                 $query->where('server_name', config('app.server_name'));
@@ -32,7 +32,7 @@ class APIInstancesController extends Controller
                             });
                     });
                 }
-                )->orderby('name')->get();
+                )->with('environment')->orderby('name')->get();
         }
 
     }   
