@@ -23,8 +23,25 @@ class SchedulerController extends Controller
     }
     
     public function browse() {
-        return Scheduler::with(['api_instance'=>function($query){
-            $query->with('environment');
+        return Scheduler::select('id',
+                                  'name',
+                                  'cron',
+                                  'route',
+                                  'args',
+                                  'verb',
+                                  'enabled',
+                                  'last_exec_cron',
+                                  'last_exec_start',
+                                  'last_exec_stop',
+                                  'created_at',
+                                  'updated_at',
+                                  'api_instance_id')->whereHas('api_instance.api', function ($query) {
+                        $query->where('api_type', 'php');
+                    })
+            ->with(['api_instance'=>function($query){
+            $query->with('environment',function($query){
+                $query->where('server_name', config('app.server_name'));
+            });
         }])->orderby('name')->get();
     }   
 
@@ -37,12 +54,21 @@ class SchedulerController extends Controller
             return response('scheduler not found', 404);
         }
     }
+    public function read_last_response($scheduler_id){
+        $scheduler = Scheduler::where('id',$scheduler_id)->select('last_response')->first();
+        if (!is_null($scheduler)) {
+            return $scheduler;
+        } else {
+            return response('scheduler not found', 404);
+        }
+    }
 
     public function edit(Request $request, $scheduler_id)
     {
         $scheduler = Scheduler::where('id',$scheduler_id)->first();
         if (!is_null($scheduler)) {
             $scheduler->update($request->all());
+            $scheduler->api_instance_id = (int)$scheduler->api_instance_id;
             return $scheduler;
         } else {
             return response('scheduler not found', 404);

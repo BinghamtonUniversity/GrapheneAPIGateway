@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ActivityLog;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class API extends Model
 {
+    use SoftDeletes;
   protected $table = 'apis';
 
-  protected $fillable = ['name', 'description', 'tags' ,'user_id'];
+  protected $fillable = ['api_type','name', 'description', 'tags' ,'user_id'];
 
   public function api_instances() {
     return $this->hasMany(APIInstance::class);
@@ -18,6 +20,15 @@ class API extends Model
   public function api_versions()
   {
     return $this->hasMany(APIVersion::class);
+  }
+  public function user(){
+      return $this->belongsTo(User::class, 'user_id');
+  }
+
+  public function developers(){
+      return $this->belongsToMany(User::class,'api_developers',
+          'api_id',   // foreign key on pivot referencing APIs table
+          'user_id');
   }
 
   public static function boot()

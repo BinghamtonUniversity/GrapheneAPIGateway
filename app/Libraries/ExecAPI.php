@@ -116,7 +116,7 @@ class ExecAPI {
                 'class '.$api_instance->api->name.' {'."\n";
 
             foreach($api_version->functions as $function) {
-                $code = implode("\n    ",explode("\n",$function->content));
+                $code = implode("\n    ", explode("\n", $function->content ?? ''));
                 if ($function->name === 'Constructor') {
                     $file_content .= 'function __construct($args=null,$resources=null,$options=null) {'."\n".
                         '    if(is_null($args)){$args=config("app.args");}if(is_null($resources)){$resources=config("app.resources");}if(is_null($options)){$options=config("app.options");}'."\n".
@@ -146,7 +146,7 @@ class ExecAPI {
                     $file_content = $code_file->content = preg_replace(
                         '/(namespace .*;)/',
                         "$1\n".$use_directive,
-                        $code_file->content,
+                        $code_file->content ?? '',
                         1,
                         $found
                     );
