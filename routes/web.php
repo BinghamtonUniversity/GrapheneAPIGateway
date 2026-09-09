@@ -70,7 +70,7 @@ $router->group(['middleware' => 'public.api.auth','prefix' => 'api'], function (
     $router->get('/scheduler/{scheduler_id}/run',['uses'=>'SchedulerController@run','middleware' => 'can:manage,App\Models\Scheduler']);
     $router->get('/scheduler/{scheduler_id}/last_response',['uses'=>'SchedulerController@read_last_response','middleware' => 'can:viewAny,App\Models\Scheduler']);
     $router->put('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@edit','middleware' => 'can:manage,App\Models\Scheduler']);
-    $router->post('/scheduler',['uses'=>'SchedulerController@add','middleware' => 'can:view,App\Models\Scheduler']);
+    $router->post('/scheduler',['uses'=>'SchedulerController@add','middleware' => 'can:manage,App\Models\Scheduler']);
     $router->delete('/scheduler/{scheduler_id}',['uses'=>'SchedulerController@delete','middleware' => 'can:delete,App\Models\Scheduler']);
 
     $router->get('/users',['uses'=>'UsersController@browse','middleware' => 'can:viewAny,App\Models\User']);
