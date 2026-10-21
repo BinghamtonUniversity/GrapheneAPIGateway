@@ -5,14 +5,14 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.1",
-        "vlucas/phpdotenv": "^5.5",
+        "php": "^8.3",
+        "vlucas/phpdotenv": "^5.7",
         "laravel/lumen-framework": "^10.0",
-        "symfony/var-dumper": "^6.3",
         "illuminate/mail": "^10.22",
-        "google/apiclient": "^2.9",
-        "mustache/mustache": "^2.14",
-        "directorytree/ldaprecord": "^3.8"
+        "symfony/var-dumper": "^6.4",
+        "google/apiclient": "^2.20",
+        "mustache/mustache": "^3.2",
+        "directorytree/ldaprecord": "^4.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -44,6 +44,11 @@
     "prefer-stable": true,
     "config": {
         "optimize-autoloader": true,
-        "platform": {"php": "8.1.0"}
+        "platform": {"php": "8.3"},
+        "policy": {
+            "advisories": {
+                "ignore-id": ["PKSA-zwc5-qtrz-zm1n"]
+            }
+        }
     }
 }
