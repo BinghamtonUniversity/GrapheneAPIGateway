@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use \App\Models\APIInstance;
+use App\Models\APIInstance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,56 +12,62 @@ class APIInstancesController extends Controller
     }
     
     public function browse() {
-        if (Auth::user()->admin){
-            return APIInstance::whereHas('environment',function($query) {
+        $user = Auth::user();
+
+        if ($user && $user->admin) {
+            return APIInstance::whereHas('environment', function($query) {
                 $query->where('server_name', config('app.server_name'));
             })
                 ->orderby('environment_id')
                 ->with(['api' => function ($query) {
                     $query->where('api_type', 'php');
-                }
-                ])->with('environment')->orderby('name')->get();
-        }else{
-            return APIInstance::whereHas('environment',function($query) {
-                $query->where('server_name', config('app.server_name'));
-            })->whereHas('api',function ($query) {
-                    $query->where('api_type', 'php')->where(function ($query) {
-                        $query->where('user_id', Auth::id())
-                            ->orWhereHas('developers', function ($q) {
-                                $q->where('users.id', Auth::id());
-                            });
-                    });
-                }
-                )->with('environment')->orderby('name')->get();
+                }])
+                ->with('environment')
+                ->orderby('name')
+                ->get();
         }
 
+        return APIInstance::whereHas('environment', function($query) {
+            $query->where('server_name', config('app.server_name'));
+        })->whereHas('api', function ($query) use ($user) {
+            $query->where('api_type', 'php')->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id ?? null)
+                  ->orWhereHas('developers', function ($devQuery) use ($user) {
+                      $devQuery->where('users.id', $user->id ?? null);
+                  });
+            });
+        })->with('environment')->orderby('name')->get();
     }   
+
     public function read($api_instance_id) {
-        $api_instance =  APIInstance::where('id',$api_instance_id)
+        $api_instance = APIInstance::where('id', $api_instance_id)
             ->with('api')
-            ->with(['environment'=>function($query) {
+            ->with(['environment' => function($query) {
                 $query->where('server_name', config('app.server_name'));
             }])
             ->first();
-        $api_instance->api_version = $api_instance->find_version();
+
         if (!is_null($api_instance)) {
+            $api_instance->api_version = $api_instance->find_version();
             return $api_instance;
-        } else {
-            return response('api_instance not found', 404);
         }
+
+        return response('api_instance not found', 404);
     }   
 
     public function edit(Request $request, $api_instance_id)
     {
-        $api_instance = APIInstance::where('id',$api_instance_id)->first();
+        $api_instance = APIInstance::where('id', $api_instance_id)->first();
         if (!is_null($api_instance)) {
             $data = $request->all();
-            if($request->api_version_id == -1 || $request->api_version_id == ''){$data['api_version_id'] = null;}
+            if (($request->api_version_id ?? null) == -1 || ($request->api_version_id ?? null) == '') {
+                $data['api_version_id'] = null;
+            }
             $api_instance->update($data);
-            return APIInstance::where('id','=',$api_instance->id)->first();
-        } else {
-            return response('api_instance not found', 404);
+            return APIInstance::where('id', '=', $api_instance->id)->first();
         }
+
+        return response('api_instance not found', 404);
     }
 
     public function add(Request $request)
@@ -74,9 +80,9 @@ class APIInstancesController extends Controller
 
     public function delete($api_instance_id)
     {
-        if ( APIInstance::where('id',$api_instance_id)->delete() ) {
+        if (APIInstance::where('id', $api_instance_id)->delete()) {
             return [true];
         }
+        return response('api_instance not found', 404);
     }
-
 }

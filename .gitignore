@@ -4,5 +4,4 @@ Homestead.json
 Homestead.yaml
 .env
 serve.sh
-bootstrap/cache
 .DS_Store

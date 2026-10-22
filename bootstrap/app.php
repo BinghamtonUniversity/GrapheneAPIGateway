@@ -11,18 +11,32 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Global Middleware (Replaces $app->middleware([...]))
+        // Exclude all routes from CSRF protection
+        $middleware->preventRequestForgery(except: [
+            '*',
+            'ajax/*',
+            'ajax/*/*',
+            'ajax/*/*/*',
+        ]);
+
+        // Remove CSRF middleware classes from the 'web' group
+        $middleware->removeFromGroup('web', [
+            \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        ]);
+
+        // Global Middleware
         $middleware->append([
             \App\Http\Middleware\HeaderUserAuth::class,
             \App\Http\Middleware\TrustProxies::class,
         ]);
 
-        // Route Middleware Aliases (Replaces $app->routeMiddleware([...]))
+        // Route Middleware Aliases
         $middleware->alias([
             'public.api.auth' => \App\Http\Middleware\PublicAPIAuth::class,
             'can'  => \App\Http\Middleware\Authorize::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Custom exception handling configuration
+        //
     })->create();

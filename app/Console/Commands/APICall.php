@@ -3,13 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Models\Environment;
+use App\Models\APIInstance;
+use App\Models\APIVersion;
+use App\Models\Scheduler;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
-use App\Scheduler;
-use Carbon\Carbon;
-use \App\Libraries\ExecAPI;
-use \App\Models\APIInstance;
-use \App\Models\APIVersion;
+use App\Libraries\ExecAPI;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class APICall extends Command
 {
@@ -22,25 +21,36 @@ class APICall extends Command
     }
 
     public function handle() {
-        if (!in_array($this->argument('verb'),['GET','POST','PUT','PATCH','DELETE'])) {
-            $this->error('Invalid Verb! Must be: GET,POST,PUT,PATCH,DELETE'); exit();
+        $verb = strtoupper($this->argument('verb'));
+        if (!in_array($verb, ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'ALL'])) {
+            $this->error('Invalid Verb! Must be: GET, POST, PUT, PATCH, DELETE');
+            return Command::FAILURE;
         }
-        $environment = Environment::where('domain',$this->argument('domain'))->first();
+
+        $environment = Environment::where('domain', $this->argument('domain'))->first();
         if (is_null($environment)) {
-            $this->error('Domain "'.$this->argument('domain').'" Not Found!'); exit();
+            $this->error('Domain "'.$this->argument('domain').'" Not Found!');
+            return Command::FAILURE;
         }
-        $api_instance = APIInstance::where('slug',$this->argument('slug'))
-            ->where('environment_id',$environment->id)
+
+        $api_instance = APIInstance::where('slug', $this->argument('slug'))
+            ->where('environment_id', $environment->id)
             ->with('api')->first();    
+
         if (is_null($api_instance)) {
-            $this->error('API Slug "'.$this->argument('slug').'" Not Found!'); exit();
+            $this->error('API Slug "'.$this->argument('slug').'" Not Found!');
+            return Command::FAILURE;
         }
-        if (substr($this->argument('route'),0,1) != '/') {
-            $this->error('Routes must start with a "/" --> Invalid: "'.$this->argument('route').'"'); exit();
+
+        $route = $this->argument('route');
+        if (!str_starts_with($route, '/')) {
+            $this->error('Routes must start with a "/" --> Invalid: "'.$route.'"');
+            return Command::FAILURE;
         }
+
         $args = [];
         foreach($this->argument('args') as $arg) {
-            $args_array = explode('=',$arg);
+            $args_array = explode('=', $arg, 2);
             if (isset($args_array[1])) {
                 $args[$args_array[0]] = $args_array[1];
             } else {
@@ -49,14 +59,18 @@ class APICall extends Command
         }
 
         $exec_api = new ExecAPI();
-        $_SERVER['REQUEST_METHOD'] = $this->argument('verb');
-        $_SERVER['REQUEST_URI'] = '/'.$api_instance->slug.$this->argument('route');
+        $_SERVER['REQUEST_METHOD'] = $verb;
+        $_SERVER['REQUEST_URI'] = '/'.$api_instance->slug.$route;
         $_GET = $args;
+
         $result = $exec_api->eval_code($api_instance);
-        if (is_a($result,'Illuminate\Http\Response')) {
-            var_dump(json_decode($result->content(),true));
+
+        if ($result instanceof SymfonyResponse) {
+            var_dump(json_decode($result->getContent(), true));
         } else {
             var_dump($result);
         }
+
+        return Command::SUCCESS;
     }
 }

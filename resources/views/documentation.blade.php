@@ -1,8 +1,10 @@
 <?php 
 $envurl = function ($path) use ($api_instance) {
-    return "http".(app('request')->secure()?'s':'')."://".$api_instance->environment->domain.'/'.$path;
-}
-?><!doctype html>
+    $domain = $api_instance->environment->domain ?? app('request')->getHost();
+    return "http".(app('request')->secure() ? 's' : '')."://".$domain.'/'.$path;
+};
+?>
+<!doctype html>
 <html>
    <head>
       <meta charset="utf-8">
@@ -12,194 +14,22 @@ $envurl = function ($path) use ($api_instance) {
       <style>
          .highlight table td { padding: 5px; }
          .highlight table pre { margin: 0; }
-         .highlight .gh {
-         color: #999999;
-         }
-         .highlight .sr {
-         color: #f6aa11;
-         }
-         .highlight .go {
-         color: #888888;
-         }
-         .highlight .gp {
-         color: #555555;
-         }
-         .highlight .gs {
-         }
-         .highlight .gu {
-         color: #aaaaaa;
-         }
-         .highlight .nb {
-         color: #f6aa11;
-         }
-         .highlight .cm {
-         color: #75715e;
-         }
-         .highlight .cp {
-         color: #75715e;
-         }
-         .highlight .c1 {
-         color: #75715e;
-         }
-         .highlight .cs {
-         color: #75715e;
-         }
-         .highlight .c, .highlight .cd {
-         color: #75715e;
-         }
-         .highlight .err {
-         color: #960050;
-         }
-         .highlight .gr {
-         color: #960050;
-         }
-         .highlight .gt {
-         color: #960050;
-         }
-         .highlight .gd {
-         color: #49483e;
-         }
-         .highlight .gi {
-         color: #49483e;
-         }
-         .highlight .ge {
-         color: #49483e;
-         }
-         .highlight .kc {
-         color: #66d9ef;
-         }
-         .highlight .kd {
-         color: #66d9ef;
-         }
-         .highlight .kr {
-         color: #66d9ef;
-         }
-         .highlight .no {
-         color: #66d9ef;
-         }
-         .highlight .kt {
-         color: #66d9ef;
-         }
-         .highlight .mf {
-         color: #ae81ff;
-         }
-         .highlight .mh {
-         color: #ae81ff;
-         }
-         .highlight .il {
-         color: #ae81ff;
-         }
-         .highlight .mi {
-         color: #ae81ff;
-         }
-         .highlight .mo {
-         color: #ae81ff;
-         }
-         .highlight .m, .highlight .mb, .highlight .mx {
-         color: #ae81ff;
-         }
-         .highlight .sc {
-         color: #ae81ff;
-         }
-         .highlight .se {
-         color: #ae81ff;
-         }
-         .highlight .ss {
-         color: #ae81ff;
-         }
-         .highlight .sd {
-         color: #e6db74;
-         }
-         .highlight .s2 {
-         color: #e6db74;
-         }
-         .highlight .sb {
-         color: #e6db74;
-         }
-         .highlight .sh {
-         color: #e6db74;
-         }
-         .highlight .si {
-         color: #e6db74;
-         }
-         .highlight .sx {
-         color: #e6db74;
-         }
-         .highlight .s1 {
-         color: #e6db74;
-         }
-         .highlight .s {
-         color: #e6db74;
-         }
-         .highlight .na {
-         color: #a6e22e;
-         }
-         .highlight .nc {
-         color: #a6e22e;
-         }
-         .highlight .nd {
-         color: #a6e22e;
-         }
-         .highlight .ne {
-         color: #a6e22e;
-         }
-         .highlight .nf {
-         color: #a6e22e;
-         }
-         .highlight .vc {
-         color: #ffffff;
-         }
-         .highlight .nn {
-         color: #ffffff;
-         }
-         .highlight .nl {
-         color: #ffffff;
-         }
-         .highlight .ni {
-         color: #ffffff;
-         }
-         .highlight .bp {
-         color: #ffffff;
-         }
-         .highlight .vg {
-         color: #ffffff;
-         }
-         .highlight .vi {
-         color: #ffffff;
-         }
-         .highlight .nv {
-         color: #ffffff;
-         }
-         .highlight .w {
-         color: #ffffff;
-         }
-         .highlight {
-         color: #ffffff;
-         }
-         .highlight .n, .highlight .py, .highlight .nx {
-         color: #ffffff;
-         }
-         .highlight .ow {
-         color: #f92672;
-         }
-         .highlight .nt {
-         color: #f92672;
-         }
-         .highlight .k, .highlight .kv {
-         color: #f92672;
-         }
-         .highlight .kn {
-         color: #f92672;
-         }
-         .highlight .kp {
-         color: #f92672;
-         }
-         .highlight .o {
-         color: #f92672;
-         }
-         .content code {
-             hyphens:none;
-         }
+         .highlight .gh { color: #999999; }
+         .highlight .sr { color: #f6aa11; }
+         .highlight .go { color: #888888; }
+         .highlight .gp { color: #555555; }
+         .highlight .gu { color: #aaaaaa; }
+         .highlight .nb { color: #f6aa11; }
+         .highlight .cm, .highlight .cp, .highlight .c1, .highlight .cs, .highlight .c, .highlight .cd { color: #75715e; }
+         .highlight .err, .highlight .gr, .highlight .gt { color: #960050; }
+         .highlight .gd, .highlight .gi, .highlight .ge { color: #49483e; }
+         .highlight .kc, .highlight .kd, .highlight .kr, .highlight .no, .highlight .kt { color: #66d9ef; }
+         .highlight .mf, .highlight .mh, .highlight .il, .highlight .mi, .highlight .mo, .highlight .m, .highlight .mb, .highlight .mx, .highlight .sc, .highlight .se, .highlight .ss { color: #ae81ff; }
+         .highlight .sd, .highlight .s2, .highlight .sb, .highlight .sh, .highlight .si, .highlight .sx, .highlight .s1, .highlight .s { color: #e6db74; }
+         .highlight .na, .highlight .nc, .highlight .nd, .highlight .ne, .highlight .nf { color: #a6e22e; }
+         .highlight .vc, .highlight .nn, .highlight .nl, .highlight .ni, .highlight .bp, .highlight .vg, .highlight .vi, .highlight .nv, .highlight .w, .highlight, .highlight .n, .highlight .py, .highlight .nx { color: #ffffff; }
+         .highlight .ow, .highlight .nt, .highlight .k, .highlight .kv, .highlight .kn, .highlight .kp, .highlight .o { color: #f92672; }
+         .content code { hyphens: none; }
       </style>
       <link href="/assets/css/font-awesome.min.css" rel="stylesheet" media="screen" />
       <link href="/assets/css/slate_screen.css" rel="stylesheet" media="screen" />
@@ -208,13 +38,9 @@ $envurl = function ($path) use ($api_instance) {
    </head>
    <body class="index" data-languages="[&quot;shell&quot;,&quot;graphene&quot;]">
       <a href="#" id="nav-button">
-      <span>
-      NAV <i class="fa fa-bars fa-rotate-90"></i>
-      <!-- <img src="/assets/images/navbar.png" alt="Navbar" /> -->
-      </span>
+         <span>NAV <i class="fa fa-bars fa-rotate-90"></i></span>
       </a>
       <div class="toc-wrapper">
-         <!-- <img src="images/logo.png" class="logo" alt="Logo" /> -->
          <div class="lang-selector">
             <a href="#" data-language-name="shell">shell</a>
             <a href="#" data-language-name="graphene">graphene</a>
@@ -236,12 +62,14 @@ $envurl = function ($path) use ($api_instance) {
             <li>
                <a href="#api-routes" class="toc-h1 toc-link" data-title="API Routes">/{{$api_instance->slug}} API</a>
                <ul class="toc-list-h2">
+               @if(is_iterable($api_version->routes ?? null))
                @foreach ($api_version->routes as $si_key => $si_route)
                <?php if (!isset($si_route->required)) { $si_route->required = []; } ?>
                   <li>
-                     <a href="#api-route-{{$si_key}}" class="toc-h2 toc-link" data-title="/{{$api_instance->slug}}{{$si_route->path}}">@if($si_route->verb == 'ALL') [ALL] @else {{$si_route->verb}} @endif {{$si_route->path}}</a>
+                     <a href="#api-route-{{$si_key}}" class="toc-h2 toc-link" data-title="/{{$api_instance->slug}}{{$si_route->path}}">@if(($si_route->verb ?? '') == 'ALL') [ALL] @else {{$si_route->verb ?? 'GET'}} @endif {{$si_route->path ?? ''}}</a>
                   </li>
                 @endforeach
+               @endif
                </ul>
             </li>
             <li>
@@ -255,13 +83,13 @@ $envurl = function ($path) use ($api_instance) {
       <div class="page-wrapper">
          <div class="dark-box"></div>
          <div class="content">
-            <h1 id='introduction'><i>{{ $api_instance->name }}</i> API <span style="float:right;color:red;font-size:15px;">({{$api_instance->environment->type}})</span></h1>
+            <h1 id='introduction'><i>{{ $api_instance->name }}</i> API <span style="float:right;color:red;font-size:15px;">({{$api_instance->environment->type ?? 'prod'}})</span></h1>
             <p>Welcome to the <i>{{ $api_instance->name }}</i> API</p>
             <h3>Description</h3>
-            <p>{{ $api_instance->api->description }}</p>
+            <p>{{ $api_instance->api->description ?? 'No description provided.' }}</p>
             <h3>Version Information</h3>
-            <p>{{ $api_version->summary }}</p>
-            <p>{{ $api_version->description }}</p>
+            <p>{{ $api_version->summary ?? '' }}</p>
+            <p>{{ $api_version->description ?? '' }}</p>
             <table>
                <thead>
                   <tr>
@@ -272,22 +100,23 @@ $envurl = function ($path) use ($api_instance) {
                </thead>
                <tbody>
                   <tr>
-                     <td>{{ $api_version->updated_at }}</td>
-                     <td>{{ $api_version->stable }}</td>
-                     <td>{{ $api_version->user_id }}</td>
+                     <td>{{ $api_version->updated_at ?? 'N/A' }}</td>
+                     <td>{{ $api_version->stable ?? '0' }}</td>
+                     <td>{{ $api_version->user_id ?? 'N/A' }}</td>
                   </tr>
                </tbody>
             </table>
+
 <!-- Resources -->
             <h1 id='resources'>Resources</h1>
-            @if(is_array($api_instance->resources) && count($api_instance->resources) > 0)
+            @if(is_iterable($api_instance->resources) && count((array)$api_instance->resources) > 0)
             <p>These are the resources (databases, external APIs, etc) which are consumed by the <i>{{ $api_instance->name }}</i> API</p>
             <p>The table below can be used to identify the type of resources being used (mysql/oracle database), as well as the resource classification (dev/test/prod)</p>
 <?php
 $local_resources = [];
 foreach($api_instance->resources as $si_resource_index => $si_resource) {
     foreach($resources as $resource) {
-        if ( $si_resource->resource == $resource->id ) {
+        if (isset($si_resource->resource) && $si_resource->resource == $resource->id) {
             $local_resources[$si_resource->name] = $resource;
         }
     }
@@ -339,9 +168,9 @@ curl {{ $envurl($api_instance->slug) }}
     -u username:password
             </code>
             </pre>
-            <p>The <i>{{ $api_instance->name }}</i> API uses HTTP basic authentication to allow access to the API.  Contact the API Developer @isset($api_instance->api->user)({{ $api_instance->api->user }}) @endisset to generate a username/password to use this API</a>.</p>
-            @if(is_array($api_instance->route_user_map))
-            <aside class="success">There is/are currently {{count($api_instance->route_user_map)}} user account(s) / app username(s) for the <i>{{ $api_instance->name }}</i> API:
+            <p>The <i>{{ $api_instance->name }}</i> API uses HTTP basic authentication to allow access to the API. Contact the API Developer @isset($api_instance->api->user)({{ $api_instance->api->user->name ?? $api_instance->api->user->email }}) @endisset to generate a username/password to use this API.</p>
+            @if(is_iterable($api_instance->route_user_map) && count((array)$api_instance->route_user_map) > 0)
+            <aside class="success">There is/are currently {{count((array)$api_instance->route_user_map)}} user account(s) / app username(s) for the <i>{{ $api_instance->name }}</i> API:
                 <ul>
                     @foreach($users as $user)
                     <li>{{ $user->app_name }}</li>
@@ -349,71 +178,72 @@ curl {{ $envurl($api_instance->slug) }}
                 </ul>
             </aside>
             @else
-       	    <aside class="warning">This API has NO configured users!</aside>
-       	    @endif
-<!-- End Authentication -->
-<!-- API --> 
-            <h1 id='api-routes'>/{{$api_instance->slug}} API</h1>
-@foreach ($api_version->routes as $si_key => $si_route)
-<?php if (!isset($si_route->required)) { $si_route->required = []; } ?>
-<!-- First One -->
+            <aside class="warning">This API has NO configured users!</aside>
+            @endif
 
-            <h2 id='api-route-{{$si_key}}'>@if($si_route->verb == 'ALL') GET,POST,PUT,DELETE @else {{$si_route->verb}} @endif /{{$api_instance->slug}}{{$si_route->path}}</h2>
+<!-- API Routes --> 
+            <h1 id='api-routes'>/{{$api_instance->slug}} API</h1>
+@if(is_iterable($api_version->routes ?? null))
+@foreach ($api_version->routes as $si_key => $si_route)
+<?php if (!isset($si_route->required) || !is_array($si_route->required)) { $si_route->required = []; } ?>
+
+            <h2 id='api-route-{{$si_key}}'>@if(($si_route->verb ?? '') == 'ALL') GET,POST,PUT,DELETE @else {{$si_route->verb ?? 'GET'}} @endif /{{$api_instance->slug}}{{$si_route->path ?? ''}}</h2>
 <pre class="highlight graphene tab-graphene">
 <b><u>Endpoint Definition</u></b>
 Auth Type: HTTP Basic Auth
 URL: {{ $envurl($api_instance->slug) }}
 
 <b><u>MicroApp</u></b>
-@if ($si_route->verb === 'ALL')
-app.get('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if($param->example !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
+@if (($si_route->verb ?? '') === 'ALL')
+app.get('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if(($param->example ?? '') !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
     app.update({api:response});
 });
-app.post('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if($param->example !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
+app.post('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if(($param->example ?? '') !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
     app.update({api:response});
 });
-app.put('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if($param->example !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
+app.put('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if(($param->example ?? '') !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
     app.update({api:response});
 });
-app.delete('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if($param->example !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
+app.delete('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if(($param->example ?? '') !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
     app.update({api:response});
 });
 @else 
-app.{{strtolower($si_route->verb)}}('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if($param->example !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
+app.{{strtolower($si_route->verb ?? 'get')}}('{{$si_route->function_name}}',{@foreach ($si_route->required as $param_index => $param){{$param->name}}:@if(($param->example ?? '') !== '')"{{$param->example}}"@else"var{{$param_index}}"@endif, @endforeach },function(response) {
     app.update({api:response});
 });
 @endif
 </pre>
-@if ($si_route->verb === 'ALL')
+
+@if (($si_route->verb ?? '') === 'ALL')
 <pre class="highlight shell tab-shell">
 <code>
-curl {{ $envurl($api_instance->slug.$si_route->path) }}?@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if($param->example !== ''){{$param->example}} @else var{{$param_index}} @endif &@endforeach
+curl {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}?@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if(($param->example ?? '') !== ''){{$param->example}} @else var{{$param_index}} @endif &@endforeach
   -u username:password
 </code>
 <code>
-curl {{ $envurl($api_instance->slug.$si_route->path) }}
+curl {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}
   -X POST
-  -d "@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if($param->example !== ''){{$param->example}} @else var {{$param_index}} @endif & @endforeach"
+  -d "@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if(($param->example ?? '') !== ''){{$param->example}} @else var {{$param_index}} @endif & @endforeach"
   -u username:password
 </code>
 <code>
-curl {{ $envurl($api_instance->slug.$si_route->path) }}
+curl {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}
   -X PUT
-  -d "@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if($param->example !== ''){{$param->example}} @else var{{$param_index}} @endif & @endforeach"
+  -d "@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if(($param->example ?? '') !== ''){{$param->example}} @else var{{$param_index}} @endif & @endforeach"
   -u username:password
 </code>
 <code>
-curl {{ $envurl($api_instance->slug.$si_route->path) }}
+curl {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}
   -X DELETE
-  -d "@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if($param->example !== ''){{$param->example}} @else var{{$param_index}} @endif & @endforeach"
+  -d "@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if(($param->example ?? '') !== ''){{$param->example}} @else var{{$param_index}} @endif & @endforeach"
   -u username:password
 </code>
 </pre>
 @else
-@if ($si_route->verb === 'GET')
+@if (($si_route->verb ?? '') === 'GET')
 <pre class="highlight shell tab-shell">
 <code>
-curl {{ $envurl($api_instance->slug.$si_route->path) }}?@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if($param->example !== ''){{$param->example}} @else var {{$param_index}} @endif & @endforeach
+curl {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}?@foreach ($si_route->required as $param_index => $param){{$param->name}}=@if(($param->example ?? '') !== ''){{$param->example}} @else var {{$param_index}} @endif & @endforeach
 
   -u username:password
 </code>
@@ -421,7 +251,7 @@ curl {{ $envurl($api_instance->slug.$si_route->path) }}?@foreach ($si_route->req
 @else 
 <pre class="highlight shell tab-shell">
 <code>
-curl {{ $envurl($api_instance->slug.$si_route->path) }}
+curl {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}
   -X {{$si_route->verb}}
   -d "@foreach ($si_route->required as $param_index => $param){{$param->name}}=var{{$param_index}}&@endforeach"
   -u username:password
@@ -429,36 +259,36 @@ curl {{ $envurl($api_instance->slug.$si_route->path) }}
 </pre>
 @endif
 @endif  
-            <p>{{$si_route->description}}</p>
-            @if ($si_route->verb === 'ALL')
+            <p>{{$si_route->description ?? ''}}</p>
+            @if (($si_route->verb ?? '') === 'ALL')
                 <h3 id='http-request'>HTTP Request</h3>
-                <p><code>GET {{ $envurl($api_instance->slug.$si_route->path) }}<?php foreach($si_route->required as $param) { echo "/&lt;".$param->name."&gt;"; }?></code></p>
-                <p><code>POST {{ $envurl($api_instance->slug.$si_route->path) }}<?php foreach($si_route->required as $param) { echo "/&lt;".$param->name."&gt;"; }?></code></p>
-                <p><code>PUT {{ $envurl($api_instance->slug.$si_route->path) }}<?php foreach($si_route->required as $param) { echo "/&lt;".$param->name."&gt;"; }?></code></p>
-                <p><code>DELETE {{ $envurl($api_instance->slug.$si_route->path) }}<?php foreach($si_route->required as $param) { echo "/&lt;".$param->name."&gt;"; }?></code></p>
+                <p><code>GET {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}<?php foreach($si_route->required as $param) { echo "/&lt;".($param->name ?? '')."&gt;"; }?></code></p>
+                <p><code>POST {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}<?php foreach($si_route->required as $param) { echo "/&lt;".($param->name ?? '')."&gt;"; }?></code></p>
+                <p><code>PUT {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}<?php foreach($si_route->required as $param) { echo "/&lt;".($param->name ?? '')."&gt;"; }?></code></p>
+                <p><code>DELETE {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}<?php foreach($si_route->required as $param) { echo "/&lt;".($param->name ?? '')."&gt;"; }?></code></p>
                 <h3>Parameters</h3>
-                @if (count($si_route->required)>0)
+                @if (count($si_route->required) > 0)
                     <aside class="note">Required parameters can be sent as x-www-form-urlencoded variables, query string variables (example: <code>?{{$si_route->required[0]->name}}=pizza)</code> or as part of the directory path (example: <code>/pizza</code>)</aside>
                 @endif
                 <aside class="note">Optional parameters can be sent as x-www-form-urlencoded variables or query string variables (example: <code>?tacos=good</code>)</aside>
             @else
                 <h3 id='http-request'>HTTP {{$si_route->verb}} Request</h3>
-                <p><code>{{$si_route->verb}} {{ $envurl($api_instance->slug.$si_route->path) }}<?php foreach($si_route->required as $param) { echo "/&lt;".$param->name."&gt;"; }?></code></p>
+                <p><code>{{$si_route->verb}} {{ $envurl($api_instance->slug.($si_route->path ?? '')) }}<?php foreach($si_route->required as $param) { echo "/&lt;".($param->name ?? '')."&gt;"; }?></code></p>
                 <h3>Parameters</h3>
-                @if ($si_route->verb === 'GET')
-                    @if (count($si_route->required)>0)
+                @if (($si_route->verb ?? '') === 'GET')
+                    @if (count($si_route->required) > 0)
                         <aside class="note">Required parameters can be sent as either query string variables (example: <code>?{{$si_route->required[0]->name}}=pizza)</code> or as part of the directory path (example: <code>/pizza</code>)</aside>
                     @endif
-                    <aside class="note">Optional parameters must be sent as  query string variables (example: <code>?tacos=good</code>)</aside>
+                    <aside class="note">Optional parameters must be sent as query string variables (example: <code>?tacos=good</code>)</aside>
                 @else
-                    @if (count($si_route->required)>0)
+                    @if (count($si_route->required) > 0)
                         <aside class="note">Required parameters can be sent as x-www-form-urlencoded {{$si_route->verb}} variables, query string variables (example: <code>?{{$si_route->required[0]->name}}=pizza)</code> or as part of the directory path (example: <code>/pizza</code>)</aside>
                     @endif
                     <aside class="note">Optional parameters can be sent as x-www-form-urlencoded {{$si_route->verb}} variables or query string variables (example: <code>?tacos=good</code>)</aside>
                 @endif
             @endif
 
-            @if (count($si_route->required)>0 || (isset($si_route->optional) && count($si_route->optional)>0))
+            @if (count($si_route->required) > 0 || (isset($si_route->optional) && count((array)$si_route->optional) > 0))
             <table>
                <thead>
                   <tr>
@@ -473,17 +303,17 @@ curl {{ $envurl($api_instance->slug.$si_route->path) }}
                   <tr>
                      <td>{{$param->name}}</td>
                      <td>required</td>
-                     <td>@if(isset($param->description)) {{$param->description}} @else N/A @endif</td>
-                     <td>@if(isset($param->example)) {{$param->example}} @else N/A @endif</td>
+                     <td>{{ $param->description ?? 'N/A' }}</td>
+                     <td>{{ $param->example ?? 'N/A' }}</td>
                   </tr>
                 @endforeach
-                @if (isset($si_route->optional) && is_array($si_route->optional))
+                @if (isset($si_route->optional) && is_iterable($si_route->optional))
                 @foreach ($si_route->optional as $param)
                   <tr>
                      <td>{{$param->name}}</td>
                      <td>optional</td>
-                     <td>@if(isset($param->description)) {{$param->description}} @else N/A @endif</td>
-                     <td>@if(isset($param->example)) {{$param->example}} @else N/A @endif</td>
+                     <td>{{ $param->description ?? 'N/A' }}</td>
+                     <td>{{ $param->example ?? 'N/A' }}</td>
                   </tr>
                 @endforeach
                 @endif
@@ -494,6 +324,8 @@ curl {{ $envurl($api_instance->slug.$si_route->path) }}
                 <aside class="warning">There are no optional parameters listed (there may be unlisted optional parameters)</aside>
             @endif
 @endforeach
+@endif
+
 <!-- Errors -->
             <h1 id='errors'>Errors</h1>
             <p>The <i>{{ $api_instance->name }}</i> API uses the following HTTP error codes:</p>
