@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,6 +13,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Rebind CSRF middleware classes in IoC container to our dummy no-op middleware
+        $this->app->bind(
+            PreventRequestForgery::class,
+            \App\Http\Middleware\DisableCsrfMiddleware::class
+        );
+
+        $this->app->bind(
+            ValidateCsrfToken::class,
+            \App\Http\Middleware\DisableCsrfMiddleware::class
+        );
+
         // Bind custom Exception Handler
         $this->app->singleton(
             \Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -34,8 +47,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Bypass CSRF verification globally across all URIs and deep nested routes
-        PreventRequestForgery::except(['*', '*/*', '*/*/*', '*/*/*/*']);
-        ValidateCsrfToken::except(['*', '*/*', '*/*/*', '*/*/*/*']);    
+        //
     }
 }
