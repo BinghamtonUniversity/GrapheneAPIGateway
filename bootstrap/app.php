@@ -10,25 +10,19 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withProviders([
-        // Core Framework Service Providers
-        \Illuminate\View\ViewServiceProvider::class,
-        \Illuminate\Filesystem\FilesystemServiceProvider::class,
-        \Illuminate\Translation\TranslationServiceProvider::class,
-        \Illuminate\Validation\ValidationServiceProvider::class,
-
-        // Application Service Providers
-        \App\Providers\AppServiceProvider::class,
-        \App\Providers\AuthServiceProvider::class,
-        \App\Providers\EventServiceProvider::class,
-    ])
     ->withMiddleware(function (Middleware $middleware) {
-        // 1. Exclude all URIs from CSRF verification using Laravel 13 syntax
-        $middleware->preventRequestForgery(except: ['*']);
+        // Exclude all routes from CSRF protection
+        $middleware->preventRequestForgery(except: [
+            '*',
+            'ajax/*',
+            'ajax/*/*',
+            'ajax/*/*/*',
+        ]);
 
-        // 2. Remove the actual Laravel 13 CSRF class from the 'web' group
+        // Remove CSRF middleware classes from the 'web' group
         $middleware->removeFromGroup('web', [
             \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
         ]);
 
         // Global Middleware
@@ -44,5 +38,5 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Custom exception handling
+        //
     })->create();

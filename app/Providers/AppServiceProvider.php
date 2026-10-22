@@ -34,6 +34,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Bypass CSRF verification globally across all URIs and deep nested routes
+        PreventRequestForgery::except(['*', '*/*', '*/*/*', '*/*/*/*']);
+        ValidateCsrfToken::except(['*', '*/*', '*/*/*', '*/*/*/*']);    
     }
 }
