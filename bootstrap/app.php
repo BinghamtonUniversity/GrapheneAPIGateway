@@ -23,8 +23,13 @@ return Application::configure(basePath: dirname(__DIR__))
         \App\Providers\EventServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
-        // Completely disable CSRF token validation for server-to-server & AJAX gateway calls
-        $middleware->validateCsrfTokens(except: ['*']);
+        // 1. Exclude all URIs from CSRF verification using Laravel 13 syntax
+        $middleware->preventRequestForgery(except: ['*']);
+
+        // 2. Remove the actual Laravel 13 CSRF class from the 'web' group
+        $middleware->removeFromGroup('web', [
+            \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
+        ]);
 
         // Global Middleware
         $middleware->append([
