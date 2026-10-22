@@ -23,10 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         \App\Providers\EventServiceProvider::class,
     ])
     ->withMiddleware(function (Middleware $middleware) {
-        // Remove CSRF validation for stateless API calls
-        $middleware->removeFromGroup('web', [
-            \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
-        ]);
+        // Completely disable CSRF token validation for server-to-server & AJAX gateway calls
+        $middleware->validateCsrfTokens(except: ['*']);
 
         // Global Middleware
         $middleware->append([
