@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Gate;
 
 class Authorize
@@ -20,15 +21,17 @@ class Authorize
 
     public function handle($request, Closure $next, $ability, $param = null)
     {
-        $routeParams = $request->route()[2] ?? [];
+        $currentRoute = $request->route();
+        $routeParams = $currentRoute instanceof Route ? $currentRoute->parameters() : [];
         $model = null;
-        // Lumen route params are in index 2
+
         if ($param && isset($routeParams[$param]) && isset($this->bindings[$param])) {
             $modelClass = $this->bindings[$param];
             $model = $modelClass::find($routeParams[$param]);
-            if (!$model) return response('Not found', 404);
-        }
-        elseif (class_exists($param)) {
+            if (!$model) {
+                return response('Not found', 404);
+            }
+        } elseif ($param && class_exists($param)) {
             $model = $param;
         }
 
@@ -38,4 +41,3 @@ class Authorize
         return $next($request);
     }
 }
-

@@ -1,27 +1,21 @@
 {
-    "name": "laravel/lumen",
+    "name": "laravel/laravel",
     "description": "Graphene API Gateway.",
-    "keywords": ["framework", "laravel", "lumen"],
+    "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^8.3",
+        "php": "^8.5",
+        "laravel/framework": "^13.0",
         "vlucas/phpdotenv": "^5.7",
-        "laravel/lumen-framework": "^10.0",
-        "illuminate/mail": "^10.22",
-        "symfony/var-dumper": "^6.4",
         "google/apiclient": "^2.20",
         "mustache/mustache": "^3.2",
         "directorytree/ldaprecord": "^4.1"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.9.1",
-        "mockery/mockery": "^1.4.4",
-        "phpunit/phpunit": "^10.0"
-    },
-    "suggest": {
-        "yajra/laravel-oci8": "Adds support for Oracle.  Version matches lumen-framework.",
-        "google/apiclient": "Adds support for Google APIs"
+        "fakerphp/faker": "^1.23",
+        "mockery/mockery": "^1.6",
+        "phpunit/phpunit": "^11.0"
     },
     "autoload": {
         "psr-4": {
@@ -43,12 +37,9 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
-        "optimize-autoloader": true,
-        "platform": {"php": "8.3"},
-        "policy": {
-            "advisories": {
-                "ignore-id": ["PKSA-zwc5-qtrz-zm1n"]
-            }
+        "optimize-autoloader": false,
+        "platform": {
+            "php": "8.5.0"
         }
     }
 }
