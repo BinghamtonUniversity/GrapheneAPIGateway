@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use \App\Models\API;
+use App\Models\API;
 use App\Models\APIDeveloper;
 use App\Models\APIInstance;
-use \App\Models\APIVersion;
+use App\Models\APIVersion;
 use Illuminate\Http\Request;
-use \Carbon\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class APIsController extends Controller
@@ -16,76 +16,79 @@ class APIsController extends Controller
     }
     
     public function browse() {
-        if (Auth::user()->admin || Auth::user()->developer){
-            return API::where('api_type','php')->orderby('name')->get();
-        }else{
-            return API::where('api_type','php')
-                ->where(function ($query) {
-                    $query->where('user_id', Auth::id())
-                        ->orWhereHas('developers', function ($q) {
-                            $q->where('users.id', Auth::id());
-                        });
-                })
-                ->orderby('name')->get();
+        $user = Auth::user();
+
+        if ($user && ($user->admin || $user->developer)) {
+            return API::where('api_type', 'php')->orderby('name')->get();
         }
 
+        return API::where('api_type', 'php')
+            ->where(function ($query) use ($user) {
+                $query->where('user_id', $user->id ?? null)
+                    ->orWhereHas('developers', function ($q) use ($user) {
+                        $q->where('users.id', $user->id ?? null);
+                    });
+            })
+            ->orderby('name')->get();
     }   
 
     public function read($api_id)
     {
-        $api = API::where('id',$api_id)->where('api_type','php')->first();
+        $api = API::where('id', $api_id)->where('api_type', 'php')->first();
         if (!is_null($api)) {
             return $api;
-        } else {
-            return response('api not found', 404);
         }
+
+        return response('api not found', 404);
     }
 
     public function versions($api_id)
     {
-        $versions = APIVersion::select('id','summary','stable','description','created_at','user_id')
-            ->where('api_id',$api_id)->where('stable','=',1)
-            ->orderby('created_at','desc')->get();
-        if (!is_null($versions)) {
+        $versions = APIVersion::select('id', 'summary', 'stable', 'description', 'created_at', 'user_id')
+            ->where('api_id', $api_id)->where('stable', '=', 1)
+            ->orderby('created_at', 'desc')->get();
+
+        if ($versions->isNotEmpty()) {
             foreach($versions as $i => $version) {
-                $version_label = $version->created_at->format('Y-m-d').' - '.$version->summary;
+                $version_label = $version->created_at?->format('Y-m-d').' - '.$version->summary;
                 if (!is_null($version->updated_at)) {
                     $version_label = $version->updated_at->format('Y-m-d').' - '.$version->summary;
                 }
                 $versions[$i]->label = $version_label;
             }    
             return $versions;
-        } else {
-            return response('api not found', 404);
         }
+
+        return response('api not found', 404);
     }
 
     public function latest_version($api_id)
     {
         $latest_version = APIVersion::select('id')
-            ->where('api_id',$api_id)
-            ->orderby('created_at','desc')->first();
+            ->where('api_id', $api_id)
+            ->orderby('created_at', 'desc')->first();
+
         if (!is_null($latest_version)) {
-            $api_version = APIVersion::where('id','=',$latest_version->id)->orderBy('created_at', 'desc')->first();
+            $api_version = APIVersion::where('id', '=', $latest_version->id)->orderBy('created_at', 'desc')->first();
             if (!is_null($api_version)) {
                 return $api_version;
             } 
         }
+
         return response('api has no latest version', 404);
     }
 
-
     public function edit(Request $request, $api_id)
     {
-        $api = API::where('id',$api_id)->where('api_type','php')->first();
+        $api = API::where('id', $api_id)->where('api_type', 'php')->first();
         if (!is_null($api)) {
             $api->updated_by = Auth::id();
             $api->update($request->all());
             $api->user_id = (int)$api->user_id;
             return $api;
-        } else {
-            return response('api not found', 404);
         }
+
+        return response('api not found', 404);
     }
 
     public function add(Request $request)
@@ -106,7 +109,7 @@ class APIsController extends Controller
         $api_version->routes = [];
         $api_version->save();
 
-        $api_developer = new APIDeveloper(['user_id'=>Auth::id(),'api_id'=>$api->id]);
+        $api_developer = new APIDeveloper(['user_id' => Auth::id(), 'api_id' => $api->id]);
         $api_developer->save();
 
         $api->user_id = (int)$api->user_id;
@@ -115,46 +118,53 @@ class APIsController extends Controller
 
     public function delete($api_id)
     {
-        if (APIInstance::where('api_id',$api_id)->exists()) {
+        if (APIInstance::where('api_id', $api_id)->exists()) {
             abort(400, "This API is in use by an API Instance, please delete the instance first!");
         }
-        if ( API::where('id',$api_id)->delete() ) {
+        if (API::where('id', $api_id)->delete()) {
             return [true];
         }
+
+        return response('api not found', 404);
     }
 
     public function publish(Request $request, $api_id) {
-        $api_version = APIVersion::where('api_id','=',$api_id)->orderBy('created_at', 'desc')->where('stable','=',0)->first();
-        if($api_version) {
+        $api_version = APIVersion::where('api_id', '=', $api_id)->orderBy('created_at', 'desc')->where('stable', '=', 0)->first();
+        if ($api_version) {
             $api_version->summary = $request->summary;
             $api_version->description = $request->description;
             $api_version->stable = true;
             $api_version->save();
             return $api_version;
-        }else{
-            abort(409, 'No changes have been made since last published.<br><br> To publish please save changes.');
         }
+
+        abort(409, 'No changes have been made since last published.<br><br> To publish please save changes.');
     }
 
     public function code(Request $request, $api_id) { 
-        $latest_version = APIVersion::select('id')->where('api_id',$api_id)->orderby('created_at','desc')->first();
-        $api_version = APIVersion::where('id','=',$latest_version->id)->orderBy('created_at', 'desc')->first();
+        $latest_version = APIVersion::select('id')->where('api_id', $api_id)->orderby('created_at', 'desc')->first();
+        
+        $api_version = $latest_version 
+            ? APIVersion::where('id', '=', $latest_version->id)->orderBy('created_at', 'desc')->first() 
+            : null;
 
         $post_data = $request->all();
-        if(!isset($post_data['updated_at']) && !isset($post_data['force']) ){
+
+        if (!isset($post_data['updated_at']) && !isset($post_data['force'])) {
             abort(403, $api_version);
         }
 
-        $first = Carbon::parse($post_data['updated_at']);
-        $second = Carbon::parse($api_version->updated_at);
-
-        if(is_null($api_version) || $api_version->stable){
+        if (is_null($api_version) || $api_version->stable) {
             $api_version = new APIVersion();
             $api_version->api_id = $api_id;
-
-        }else if(!($first->gte($second) || isset($post_data['force']))){
-            abort(409, $api_version);
+        } else if (isset($post_data['updated_at'])) {
+            $first = Carbon::parse($post_data['updated_at']);
+            $second = Carbon::parse($api_version->updated_at);
+            if (!($first->gte($second) || isset($post_data['force']))) {
+                abort(409, $api_version);
+            }
         }
+
         $api_version->files = $request->input('files');
         $api_version->functions = $request->functions;
         $api_version->resources = $request->resources;
@@ -168,21 +178,19 @@ class APIsController extends Controller
         return $api_version;
     }
 
-    public function browseDevelopers(Request $request, $api_id){
-        return APIDeveloper::where('api_id','=',$api_id)->get();
+    public function browseDevelopers(Request $request, $api_id) {
+        return APIDeveloper::where('api_id', '=', $api_id)->get();
     }
 
-    public function addDeveloper(Request $request, $api_id, $user_id){
-        $api_developer = new APIDeveloper(['user_id'=>$user_id,'api_id'=>$api_id]);
+    public function addDeveloper(Request $request, $api_id, $user_id) {
+        $api_developer = new APIDeveloper(['user_id' => $user_id, 'api_id' => $api_id]);
         $api_developer->save();
 
         return $api_developer;
     }
 
-    public function deleteDeveloper(Request $request, $api_id, $user_id){
-        APIDeveloper::where('api_id','=',$api_id)->where('user_id','=',$user_id)->delete();
-        return [ 'message'=> "Success" ];
+    public function deleteDeveloper(Request $request, $api_id, $user_id) {
+        APIDeveloper::where('api_id', '=', $api_id)->where('user_id', '=', $user_id)->delete();
+        return ['message' => "Success"];
     }
-
-
 }

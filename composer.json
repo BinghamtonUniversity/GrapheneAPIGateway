@@ -12,6 +12,9 @@
         "mustache/mustache": "^3.2",
         "directorytree/ldaprecord": "^4.1"
     },
+    "suggest": {
+        "yajra/laravel-oci8":"Adds support for Oracle Database"
+    },
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "mockery/mockery": "^1.6",

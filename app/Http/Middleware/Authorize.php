@@ -25,11 +25,17 @@ class Authorize
         $routeParams = $currentRoute instanceof Route ? $currentRoute->parameters() : [];
         $model = null;
 
-        if ($param && isset($routeParams[$param]) && isset($this->bindings[$param])) {
-            $modelClass = $this->bindings[$param];
-            $model = $modelClass::find($routeParams[$param]);
-            if (!$model) {
-                return response('Not found', 404);
+        if ($param && isset($routeParams[$param])) {
+            $paramValue = $routeParams[$param];
+
+            if (is_object($paramValue)) {
+                $model = $paramValue;
+            } elseif (isset($this->bindings[$param])) {
+                $modelClass = $this->bindings[$param];
+                $model = $modelClass::find($paramValue);
+                if (!$model) {
+                    return response('Not found', 404);
+                }
             }
         } elseif ($param && class_exists($param)) {
             $model = $param;

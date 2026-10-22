@@ -11,10 +11,10 @@ class Resource extends Model
   protected $fillable = ['name','type','config','resource_type'];
   protected $secret_fields = ['password','pass','secret','key'];
 
-  private function getConfigHelper($config_string,$return_secrets=false)
+  private function getConfigHelper($config_string, $return_secrets = false)
   {
-    if (!is_null($config_string) && $config_string != '') {
-      $resource_config = json_decode($config_string,true);
+    if (!is_null($config_string) && $config_string !== '') {
+      $resource_config = is_array($config_string) ? $config_string : json_decode($config_string, true);
       if (is_array($resource_config)) {
         foreach($resource_config as $index => $config_attr) {
           foreach($this->secret_fields as $secret_field) {
@@ -22,7 +22,7 @@ class Resource extends Model
               if ($return_secrets === true) {
                 try {
                   $resource_config[$index] = Crypt::decrypt($resource_config[$index]);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                   /* Do Nothing -- Don't Change Value */
                 }
               } else {
@@ -32,59 +32,65 @@ class Resource extends Model
           }
         }
         return (object)$resource_config;
-      } else {
-        return (object)[];
       }
-    } else {
-      return null;
     }
+    return (object)[];
   }
 
   public function getConfigAttribute($config_string)
   {
-    return $this->getConfigHelper($config_string,false);
+    return $this->getConfigHelper($config_string, false);
   }
 
   public function getConfigWithSecretsAttribute($config_string)
   {
-    return $this->getConfigHelper($this->attributes['config'],true);
+    $rawConfig = $this->attributes['config'] ?? null;
+    return $this->getConfigHelper($rawConfig, true);
   }
 
   public function setConfigAttribute($new_config)
   {
     $orig_config = [];
     if (isset($this->attributes['config'])) {
-      $orig_config = json_decode($this->attributes['config'],true);
+      $orig_config = json_decode($this->attributes['config'], true) ?? [];
     }
-    foreach($new_config as $index => $new_config_attr) {
-      foreach($this->secret_fields as $secret_field) {
-        if (($index === $secret_field || $this->resource_type === $secret_field) && $new_config_attr !== '*****' && $new_config_attr !== '') {
-          $new_config[$index] = Crypt::encrypt($new_config_attr);
-        } else if (($index === $secret_field || $this->resource_type === $secret_field) && $new_config_attr === '*****' && isset($orig_config[$index])) {
-          $new_config[$index] = $orig_config[$index];
+
+    if (is_string($new_config)) {
+      $new_config = json_decode($new_config, true) ?? [];
+    }
+
+    if (is_array($new_config)) {
+      foreach($new_config as $index => $new_config_attr) {
+        foreach($this->secret_fields as $secret_field) {
+          if (($index === $secret_field || $this->resource_type === $secret_field) && $new_config_attr !== '*****' && $new_config_attr !== '') {
+            $new_config[$index] = Crypt::encrypt($new_config_attr);
+          } else if (($index === $secret_field || $this->resource_type === $secret_field) && $new_config_attr === '*****' && isset($orig_config[$index])) {
+            $new_config[$index] = $orig_config[$index];
+          }
         }
       }
+      $this->attributes['config'] = json_encode($new_config);
+    } else {
+      $this->attributes['config'] = json_encode([]);
     }
-    $this->attributes['config'] = json_encode($new_config);
   }
 
-  public static function boot()
+  protected static function booted()
   {
-    parent::boot();
-    self::saved(function($model){
+    static::saved(function($model){
       if (!app()->runningInConsole()) {
         $orig = $model->getOriginal();
-        foreach($orig as $attr => $attr_val) {
-          if ($attr === 'config') {
-            // $orig[$attr] = json_decode($attr_val,true);
-            if (!is_array($orig[$attr])) { $orig[$attr] = [];} // Initialize Empty Array
-            foreach($orig[$attr] as $index => $config_attr) {
+        if (isset($orig['config']) && is_string($orig['config'])) {
+          $configData = json_decode($orig['config'], true);
+          if (is_array($configData)) {
+            foreach($configData as $index => $config_attr) {
               foreach($model->secret_fields as $secret_field) {
-                if (($index === $secret_field || $orig['resource_type'] === $secret_field)) {
-                  $orig[$attr][$index] = '*****';
+                if ($index === $secret_field || ($orig['resource_type'] ?? null) === $secret_field) {
+                  $configData[$index] = '*****';
                 }
               }
             }
+            $orig['config'] = $configData;
           }
         }
         $activity_log = new ActivityLog([
@@ -96,5 +102,4 @@ class Resource extends Model
       }
     });
   }
-
 }

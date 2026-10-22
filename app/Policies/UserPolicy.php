@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\API;
 
 class UserPolicy
 {
@@ -22,7 +21,7 @@ class UserPolicy
         return $user->admin;
     }
 
-    public function delete(User $user, API $api)
+    public function delete(User $user, User $targetUser = null)
     {
         return $user->admin;
     }
