@@ -21,8 +21,10 @@ class ActivityLog extends Model
         $model->comment = '';
         $model->action = $request->method();
 
-        if ($request->has('id')) {
+        if ($request->has('id') &&  !is_null($request->input('id'))) {
             $model->event_id = $request->input('id');
+        }else{
+            $model->event_id = $model->new->id;
         }
         if ($request->has('user_id')) {
             $model->user_id = $request->input('user_id');
