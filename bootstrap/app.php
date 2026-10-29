@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -23,6 +25,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->removeFromGroup('web', [
             \Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class,
             \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        ]);
+
+        // Don't trim or null-ify the code editor payload
+        $middleware->trimStrings(except: [
+            fn (Request $request) => $request->is('api/apis/*/code'),
+        ]);
+
+        $middleware->convertEmptyStringsToNull(except: [
+            fn (Request $request) => $request->is('api/apis/*/code')
         ]);
 
         // Global Middleware

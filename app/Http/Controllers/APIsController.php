@@ -44,22 +44,18 @@ class APIsController extends Controller
 
     public function versions($api_id)
     {
-        $versions = APIVersion::select('id', 'summary', 'stable', 'description', 'created_at', 'user_id')
-            ->where('api_id', $api_id)->where('stable', '=', 1)
-            ->orderby('created_at', 'desc')->get();
+        $versions = APIVersion::select('id', 'summary', 'stable', 'description', 'created_at', 'updated_at', 'user_id')
+            ->where('api_id', $api_id)
+            ->where('stable', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        if ($versions->isNotEmpty()) {
-            foreach($versions as $i => $version) {
-                $version_label = $version->created_at?->format('Y-m-d').' - '.$version->summary;
-                if (!is_null($version->updated_at)) {
-                    $version_label = $version->updated_at->format('Y-m-d').' - '.$version->summary;
-                }
-                $versions[$i]->label = $version_label;
-            }    
-            return $versions;
+        foreach ($versions as $version) {
+            $date = $version->updated_at ?? $version->created_at;
+            $version->label = $date?->format('Y-m-d') . ' - ' . $version->summary;
         }
 
-        return response('api not found', 404);
+        return $versions;
     }
 
     public function latest_version($api_id)
@@ -157,6 +153,7 @@ class APIsController extends Controller
         if (is_null($api_version) || $api_version->stable) {
             $api_version = new APIVersion();
             $api_version->api_id = $api_id;
+            $api_version->user_id = Auth::id();
         } else if (isset($post_data['updated_at'])) {
             $first = Carbon::parse($post_data['updated_at']);
             $second = Carbon::parse($api_version->updated_at);
