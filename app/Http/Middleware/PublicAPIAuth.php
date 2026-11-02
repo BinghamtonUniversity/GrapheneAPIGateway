@@ -2,9 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Closure;
+use Illuminate\Http\Request;
 
 class PublicAPIAuth
 {
@@ -15,23 +14,17 @@ class PublicAPIAuth
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        $logged_in = false;
-        if ($request->header('PHP_AUTH_USER', null) && $request->header('PHP_AUTH_PW', null)) {
-            $username = $request->header('PHP_AUTH_USER');
-            $password = $request->header('PHP_AUTH_PW');
+        $username = $request->getUser() ?? $request->header('PHP_AUTH_USER');
+        $password = $request->getPassword() ?? $request->header('PHP_AUTH_PW');
 
-            if ($username == config('app.auth.user') && $password == config('app.auth.password')) {
-                $logged_in = true;
-            }
+        $loggedIn = ($username === config('app.auth.user') && $password === config('app.auth.password'));
+
+        if (!$loggedIn) {
+            return response('Invalid credentials.', 401, ['WWW-Authenticate' => 'Basic']);
         }
-    
-        if ($logged_in === false) {
-            $headers = ['WWW-Authenticate' => 'Basic'];
-            return response()->make('Invalid credentials.', 401, $headers);
-        } else {
-            return $next($request);
-        }    
+
+        return $next($request);
     }
 }

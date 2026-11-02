@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\Crypt;
+use Throwable;
 
 class APIUser extends Model
 {
@@ -30,29 +31,31 @@ class APIUser extends Model
   }
 
   public function getDecryptedAppSecretAttribute($secret) {
+    $encrypted = $this->attributes['encrypted_app_secret'] ?? null;
+    if (!$encrypted) {
+      return base64_encode('');
+    }
+
     try {
-        return base64_encode(Crypt::decrypt($this->attributes['encrypted_app_secret']));
-    } catch (\Exception $e) {
+        return base64_encode(Crypt::decrypt($encrypted));
+    } catch (Throwable $e) {
         return base64_encode("ERROR");
     }
   }
 
   public function check_app_secret($secret) {
-    return Hash::check($secret, $this->attributes['app_secret']);
+    $hashedSecret = $this->attributes['app_secret'] ?? '';
+    return Hash::check($secret, $hashedSecret);
   }
 
-  public static function boot()
+  protected static function booted()
   {
-    parent::boot();
-    self::saved(function($model){
+    static::saved(function($model){
       if (!app()->runningInConsole()) {
         $orig = $model->getOriginal();
-        // foreach($orig as $attr => $attr_val) {
-        //   if (isset($model->casts[$attr]) && $model->casts[$attr] === 'object') {
-        //     $orig[$attr] = json_decode($attr_val);
-        //   }
-        // }
-        if (isset($orig['app_secret']) && $orig['app_secret'] !== '') {$orig['app_secret'] = '*****';}
+        if (isset($orig['app_secret']) && $orig['app_secret'] !== '') {
+          $orig['app_secret'] = '*****';
+        }
         $activity_log = new ActivityLog([
           'event' => class_basename($model),
           'new' => $model,
@@ -62,7 +65,4 @@ class APIUser extends Model
       }
     });
   }
-
 }
-
-

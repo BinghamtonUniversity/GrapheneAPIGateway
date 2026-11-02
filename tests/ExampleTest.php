@@ -1,21 +1,16 @@
 <?php
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
+namespace Tests;
 
 class ExampleTest extends TestCase
 {
     /**
      * A basic test example.
-     *
-     * @return void
      */
-    public function testExample()
+    public function test_the_application_returns_a_successful_response(): void
     {
-        $this->get('/');
+        $response = $this->get('/');
 
-        $this->assertEquals(
-            $this->app->version(), $this->response->getContent()
-        );
+        $response->assertStatus(200);
     }
 }

@@ -3,9 +3,9 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Laravel\Lumen\Console\Kernel as ConsoleKernel;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\DB;
-use Schema;
+use Illuminate\Support\Facades\Schema;
 
 class Kernel extends ConsoleKernel
 {
@@ -32,17 +32,30 @@ class Kernel extends ConsoleKernel
         try {
             DB::connection()->getPdo();
             if (Schema::hasTable('scheduler')) {
-                $tasks = DB::table('scheduler')->select('id','cron')->get();
-                foreach($tasks as $task) {
+                $tasks = DB::table('scheduler')->select('id', 'cron')->get();
+                foreach ($tasks as $task) {
                     $schedule->command('schedule:exec '.$task->id)
                         ->cron($task->cron)
                         ->onOneServer()
                         ->runInBackground();
                 }
-            }    
+            }
         } catch (\Exception $e) {
             // Do nothing... we don't really care
         }
     }
 
+    /**
+     * Register the commands for the application.
+     *
+     * @return void
+     */
+    protected function commands()
+    {
+        $this->load(__DIR__.'/Commands');
+
+        if (file_exists(base_path('routes/console.php'))) {
+            require base_path('routes/console.php');
+        }
+    }
 }

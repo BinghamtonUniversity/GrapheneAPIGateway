@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Cron\CronExpression;
 use App\Models\ActivityLog;
+use Throwable;
 
 class Scheduler extends Model
 {
@@ -19,29 +20,32 @@ class Scheduler extends Model
   }
 
   public function getNextRuntimesAttribute() {
+    $cronString = $this->attributes['cron'] ?? null;
+    if (!$cronString) {
+      return [];
+    }
+
     try {
-      $cron = CronExpression::factory($this->attributes['cron']);
+      $cron = new CronExpression($cronString);
       return [
-        $cron->getNextRunDate(null,0)->format('Y-m-d H:i:s'),
-        $cron->getNextRunDate(null,1)->format('Y-m-d H:i:s'),
-        $cron->getNextRunDate(null,2)->format('Y-m-d H:i:s'),
-        $cron->getNextRunDate(null,3)->format('Y-m-d H:i:s'),
-        $cron->getNextRunDate(null,4)->format('Y-m-d H:i:s'),
+        $cron->getNextRunDate('now', 0)->format('Y-m-d H:i:s'),
+        $cron->getNextRunDate('now', 1)->format('Y-m-d H:i:s'),
+        $cron->getNextRunDate('now', 2)->format('Y-m-d H:i:s'),
+        $cron->getNextRunDate('now', 3)->format('Y-m-d H:i:s'),
+        $cron->getNextRunDate('now', 4)->format('Y-m-d H:i:s'),
       ];
-    } catch (\Exception $e) {
+    } catch (Throwable $e) {
       return [];
     }
   }
 
-  public static function boot()
+  protected static function booted()
   {
-    parent::boot();
-    self::saved(function($model){
+    static::saved(function($model){
       if (!app()->runningInConsole()) {
-        //09/02/2026, AKT - Removing the last_response to be recorded in the activity logs//
-          if ($model->last_response) {
-              unset($model->last_response);
-          }
+        if (isset($model->last_response)) {
+            unset($model->last_response);
+        }
         $orig = $model->getOriginal();
 
         $activity_log = new ActivityLog([
@@ -53,6 +57,4 @@ class Scheduler extends Model
       }
     });
   }
-
-
 }
